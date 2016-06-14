@@ -33,28 +33,28 @@ import collections
 #     Methods: None
 #========================================================================
 class ExcelParserTokens:
-    TOK_TYPE_NOOP           = "noop";
-    TOK_TYPE_OPERAND        = "operand";
-    TOK_TYPE_FUNCTION       = "function";
-    TOK_TYPE_SUBEXPR        = "subexpression";
-    TOK_TYPE_ARGUMENT       = "argument";
-    TOK_TYPE_OP_PRE         = "operator-prefix";
-    TOK_TYPE_OP_IN          = "operator-infix";
-    TOK_TYPE_OP_POST        = "operator-postfix";
-    TOK_TYPE_WSPACE         = "white-space";
+    TOK_TYPE_NOOP           = "noop"
+    TOK_TYPE_OPERAND        = "operand"
+    TOK_TYPE_FUNCTION       = "function"
+    TOK_TYPE_SUBEXPR        = "subexpression"
+    TOK_TYPE_ARGUMENT       = "argument"
+    TOK_TYPE_OP_PRE         = "operator-prefix"
+    TOK_TYPE_OP_IN          = "operator-infix"
+    TOK_TYPE_OP_POST        = "operator-postfix"
+    TOK_TYPE_WSPACE         = "white-space"
     TOK_TYPE_UNKNOWN        = "unknown"
     
-    TOK_SUBTYPE_START       = "start";
-    TOK_SUBTYPE_STOP        = "stop";
-    TOK_SUBTYPE_TEXT        = "text";
-    TOK_SUBTYPE_NUMBER      = "number";
-    TOK_SUBTYPE_LOGICAL     = "logical";
-    TOK_SUBTYPE_ERROR       = "error";
-    TOK_SUBTYPE_RANGE       = "range";
-    TOK_SUBTYPE_MATH        = "math";
-    TOK_SUBTYPE_CONCAT      = "concatenate";
-    TOK_SUBTYPE_INTERSECT   = "intersect";
-    TOK_SUBTYPE_UNION       = "union";
+    TOK_SUBTYPE_START       = "start"
+    TOK_SUBTYPE_STOP        = "stop"
+    TOK_SUBTYPE_TEXT        = "text"
+    TOK_SUBTYPE_NUMBER      = "number"
+    TOK_SUBTYPE_LOGICAL     = "logical"
+    TOK_SUBTYPE_ERROR       = "error"
+    TOK_SUBTYPE_RANGE       = "range"
+    TOK_SUBTYPE_MATH        = "math"
+    TOK_SUBTYPE_CONCAT      = "concatenate"
+    TOK_SUBTYPE_INTERSECT   = "intersect"
+    TOK_SUBTYPE_UNION       = "union"
 
 #========================================================================
 #       Class: f_token 
@@ -164,8 +164,10 @@ class f_tokenStack(ExcelParserTokens):
         return f_token("", token.ttype, self.TOK_SUBTYPE_STOP)
         
     def token(self):
-        # Note: this uses Pythons and/or "hack" to emulate C's ternary operator (i.e. cond ? exp1 : exp2)
-        return ((len(self.items) > 0) and [self.items[len(self.items) - 1]] or [None])[0]
+        # Note: this uses Pythons and/or "hack"
+        # to emulate C's ternary operator (i.e. cond ? exp1 : exp2)
+        return ((len(self.items) > 0) and [self.items[len(self.items) - 1]]
+                or [None])[0]
     
     def value(self):
         return ((self.token()) and [(self.token()).tvalue] or [""])[0]    
@@ -281,13 +283,13 @@ class ExcelParser(ExcelParserTokens):
                 continue;
     
             # scientific notation check
-            regexSN = '^[1-9]{1}(\.[0-9]+)?[eE]{1}$';
-            if (("+-").find(currentChar()) != -1):
+            regexSN = '^[1-9]{1}(\.[0-9]+)?[eE]{1}$'
+            if ("+-").find(currentChar()) != -1:
                 if len(token) > 1:
                     if re.match(regexSN,token):
-                        token += currentChar();
-                        offset += 1;
-                        continue;
+                        token += currentChar()
+                        offset += 1
+                        continue
               
             # independent character evaulation (order not important)
             #
@@ -310,14 +312,14 @@ class ExcelParser(ExcelParserTokens):
                 offset += 1
                 continue
     
-            if (currentChar() == "["):
+            if currentChar() == "[":
                 inRange = True
                 token += currentChar()
                 offset += 1
                 continue
     
-            if (currentChar() == "#"):
-                if (len(token) > 0):
+            if currentChar() == "#":
+                if len(token) > 0:
                     # not expected
                     tokens.add(token, self.TOK_TYPE_UNKNOWN)
                     token = ""
@@ -327,8 +329,8 @@ class ExcelParser(ExcelParserTokens):
                 continue
     
             # mark start and end of arrays and array rows
-            if (currentChar() == "{"):
-                if (len(token) > 0):
+            if currentChar() == "{":
+                if len(token) > 0:
                     # not expected
                     tokens.add(token, self.TOK_TYPE_UNKNOWN)
                     token = ""
@@ -337,8 +339,8 @@ class ExcelParser(ExcelParserTokens):
                 offset += 1
                 continue
     
-            if (currentChar() == ";"):
-                if (len(token) > 0):
+            if currentChar() == ";":
+                if len(token) > 0:
                     tokens.add(token, self.TOK_TYPE_OPERAND)
                     token = ""
                 tokens.addRef(tokenStack.pop())
@@ -347,8 +349,8 @@ class ExcelParser(ExcelParserTokens):
                 offset += 1
                 continue
     
-            if (currentChar() == "}"):
-                if (len(token) > 0):
+            if currentChar() == "}":
+                if len(token) > 0:
                     tokens.add(token, self.TOK_TYPE_OPERAND)
                     token = ""
                 tokens.addRef(tokenStack.pop())
@@ -357,19 +359,19 @@ class ExcelParser(ExcelParserTokens):
                 continue
     
             # trim white-space
-            if (currentChar() == " "):
-                if (len(token) > 0):
+            if currentChar() == " ":
+                if len(token) > 0:
                     tokens.add(token, self.TOK_TYPE_OPERAND)
                     token = ""
                 tokens.add("", self.TOK_TYPE_WSPACE)
                 offset += 1
-                while ((currentChar() == " ") and (not EOF())):
+                while (currentChar() == " ") and (not EOF()):
                     offset += 1
                 continue
     
             # multi-character comparators
-            if (",>=,<=,<>,".find("," + doubleChar() + ",") != -1):
-                if (len(token) > 0):
+            if ",>=,<=,<>,".find("," + doubleChar() + ",") != -1:
+                if len(token) > 0:
                     tokens.add(token, self.TOK_TYPE_OPERAND)
                     token = ""
                 tokens.add(doubleChar(), self.TOK_TYPE_OP_IN, self.TOK_SUBTYPE_LOGICAL)
@@ -377,8 +379,8 @@ class ExcelParser(ExcelParserTokens):
                 continue
     
             # standard infix operators
-            if ("+-*/^&=><".find(currentChar()) != -1):
-                if (len(token) > 0):
+            if "+-*/^&=><".find(currentChar()) != -1:
+                if len(token) > 0:
                     tokens.add(token, self.TOK_TYPE_OPERAND)
                     token = ""
                 tokens.add(currentChar(), self.TOK_TYPE_OP_IN)
@@ -386,8 +388,8 @@ class ExcelParser(ExcelParserTokens):
                 continue
     
             # standard postfix operators
-            if ("%".find(currentChar()) != -1):
-                if (len(token) > 0):
+            if "%".find(currentChar()) != -1:
+                if len(token) > 0:
                     tokens.add(token, self.TOK_TYPE_OPERAND)
                     token = ""
                 tokens.add(currentChar(), self.TOK_TYPE_OP_POST)
@@ -395,8 +397,8 @@ class ExcelParser(ExcelParserTokens):
                 continue
     
             # start subexpression or function
-            if (currentChar() == "("):
-                if (len(token) > 0):
+            if currentChar() == "(":
+                if len(token) > 0:
                     tokenStack.push(tokens.add(token, self.TOK_TYPE_FUNCTION, self.TOK_SUBTYPE_START))
                     token = ""
                 else:
@@ -405,11 +407,11 @@ class ExcelParser(ExcelParserTokens):
                 continue
     
             # function, subexpression, array parameters
-            if (currentChar() == ","):
-                if (len(token) > 0):
+            if currentChar() == ",":
+                if len(token) > 0:
                     tokens.add(token, self.TOK_TYPE_OPERAND)
                     token = ""
-                if (not (tokenStack.type() == self.TOK_TYPE_FUNCTION)):
+                if not (tokenStack.type() == self.TOK_TYPE_FUNCTION):
                     tokens.add(currentChar(), self.TOK_TYPE_OP_IN, self.TOK_SUBTYPE_UNION)
                 else:
                     tokens.add(currentChar(), self.TOK_TYPE_ARGUMENT)
@@ -417,8 +419,8 @@ class ExcelParser(ExcelParserTokens):
                 continue
     
             # stop subexpression
-            if (currentChar() == ")"):
-                if (len(token) > 0):
+            if currentChar() == ")":
+                if len(token) > 0:
                     tokens.add(token, self.TOK_TYPE_OPERAND)
                     token = ""
                 tokens.addRef(tokenStack.pop())
@@ -430,28 +432,32 @@ class ExcelParser(ExcelParserTokens):
             offset += 1
     
         # dump remaining accumulation
-        if (len(token) > 0): 
+        if len(token) > 0:
             tokens.add(token, self.TOK_TYPE_OPERAND)
     
         # move all tokens to a new collection, excluding all unnecessary white-space tokens
         tokens2 = f_tokens()
     
-        while (tokens.moveNext()):
-            token = tokens.current();
+        while tokens.moveNext():
+            token = tokens.current()
     
-            if (token.ttype == self.TOK_TYPE_WSPACE):
-                if ((tokens.BOF()) or (tokens.EOF())):
+            if token.ttype == self.TOK_TYPE_WSPACE:
+                if (tokens.BOF()) or (tokens.EOF()):
                     pass
                 elif (not(
-                     ((tokens.previous().ttype == self.TOK_TYPE_FUNCTION) and (tokens.previous().tsubtype == self.TOK_SUBTYPE_STOP)) or 
-                     ((tokens.previous().ttype == self.TOK_TYPE_SUBEXPR) and (tokens.previous().tsubtype == self.TOK_SUBTYPE_STOP)) or 
+                     ((tokens.previous().ttype == self.TOK_TYPE_FUNCTION)
+                      and (tokens.previous().tsubtype == self.TOK_SUBTYPE_STOP)) or
+                     ((tokens.previous().ttype == self.TOK_TYPE_SUBEXPR)
+                      and (tokens.previous().tsubtype == self.TOK_SUBTYPE_STOP)) or
                      (tokens.previous().ttype == self.TOK_TYPE_OPERAND)
                     )
                   ):
                     pass
                 elif (not(
-                     ((tokens.next().ttype == self.TOK_TYPE_FUNCTION) and (tokens.next().tsubtype == self.TOK_SUBTYPE_START)) or
-                     ((tokens.next().ttype == self.TOK_TYPE_SUBEXPR) and (tokens.next().tsubtype == self.TOK_SUBTYPE_START)) or
+                     ((tokens.next().ttype == self.TOK_TYPE_FUNCTION)
+                      and (tokens.next().tsubtype == self.TOK_SUBTYPE_START)) or
+                     ((tokens.next().ttype == self.TOK_TYPE_SUBEXPR)
+                      and (tokens.next().tsubtype == self.TOK_SUBTYPE_START)) or
                      (tokens.next().ttype == self.TOK_TYPE_OPERAND)
                      )
                    ):
@@ -460,14 +466,15 @@ class ExcelParser(ExcelParserTokens):
                     tokens2.add(token.tvalue, self.TOK_TYPE_OP_IN, self.TOK_SUBTYPE_INTERSECT)
                 continue
     
-            tokens2.addRef(token);
+            tokens2.addRef(token)
     
-        # switch infix "-" operator to prefix when appropriate, switch infix "+" operator to noop when appropriate, identify operand 
+        # switch infix "-" operator to prefix when appropriate,
+        # switch infix "+" operator to noop when appropriate, identify operand
         # and infix-operator subtypes, pull "@" from in front of function names
-        while (tokens2.moveNext()):
+        while tokens2.moveNext():
             token = tokens2.current()
-            if ((token.ttype == self.TOK_TYPE_OP_IN) and (token.tvalue == "-")):
-                if (tokens2.BOF()):
+            if (token.ttype == self.TOK_TYPE_OP_IN) and (token.tvalue == "-"):
+                if tokens2.BOF():
                     token.ttype = self.TOK_TYPE_OP_PRE
                 elif (
                    ((tokens2.previous().ttype == self.TOK_TYPE_FUNCTION) and (tokens2.previous().tsubtype == self.TOK_SUBTYPE_STOP)) or
@@ -475,13 +482,13 @@ class ExcelParser(ExcelParserTokens):
                    (tokens2.previous().ttype == self.TOK_TYPE_OP_POST) or 
                    (tokens2.previous().ttype == self.TOK_TYPE_OPERAND)
                   ):
-                    token.tsubtype = self.TOK_SUBTYPE_MATH;
+                    token.tsubtype = self.TOK_SUBTYPE_MATH
                 else:
                     token.ttype = self.TOK_TYPE_OP_PRE
                 continue
     
-            if ((token.ttype == self.TOK_TYPE_OP_IN) and (token.tvalue == "+")):
-                if (tokens2.BOF()):
+            if (token.ttype == self.TOK_TYPE_OP_IN) and (token.tvalue == "+"):
+                if tokens2.BOF():
                     token.ttype = self.TOK_TYPE_NOOP
                 elif (
                    ((tokens2.previous().ttype == self.TOK_TYPE_FUNCTION) and (tokens2.previous().tsubtype == self.TOK_SUBTYPE_STOP)) or 
@@ -494,20 +501,20 @@ class ExcelParser(ExcelParserTokens):
                     token.ttype = self.TOK_TYPE_NOOP
                 continue
     
-            if ((token.ttype == self.TOK_TYPE_OP_IN) and (len(token.tsubtype) == 0)):
-                if (("<>=").find(token.tvalue[0:1]) != -1):
+            if (token.ttype == self.TOK_TYPE_OP_IN) and (len(token.tsubtype) == 0):
+                if "<>=".find(token.tvalue[0:1]) != -1:
                     token.tsubtype = self.TOK_SUBTYPE_LOGICAL
-                elif (token.tvalue == "&"):
+                elif token.tvalue == "&":
                     token.tsubtype = self.TOK_SUBTYPE_CONCAT
                 else:
                     token.tsubtype = self.TOK_SUBTYPE_MATH
                 continue
         
-            if ((token.ttype == self.TOK_TYPE_OPERAND) and (len(token.tsubtype) == 0)):
+            if (token.ttype == self.TOK_TYPE_OPERAND) and (len(token.tsubtype) == 0):
                 try:
                     float(token.tvalue)
-                except ValueError, e:
-                    if ((token.tvalue == 'TRUE') or (token.tvalue == 'FALSE')):
+                except ValueError as e:
+                    if (token.tvalue == 'TRUE') or (token.tvalue == 'FALSE'):
                         token.tsubtype = self.TOK_SUBTYPE_LOGICAL
                     else:
                         token.tsubtype = self.TOK_SUBTYPE_RANGE
@@ -515,17 +522,17 @@ class ExcelParser(ExcelParserTokens):
                     token.tsubtype = self.TOK_SUBTYPE_NUMBER
                 continue
     
-            if (token.ttype == self.TOK_TYPE_FUNCTION):
-                if (token.tvalue[0:1] == "@"):
+            if token.ttype == self.TOK_TYPE_FUNCTION:
+                if token.tvalue[0:1] == "@":
                     token.tvalue = token.tvalue[1:]
                 continue
     
-        tokens2.reset();
+        tokens2.reset()
     
         # move all tokens to a new collection, excluding all noops
         tokens = f_tokens()
-        while (tokens2.moveNext()):
-            if (tokens2.current().ttype != self.TOK_TYPE_NOOP):
+        while tokens2.moveNext():
+            if tokens2.current().ttype != self.TOK_TYPE_NOOP:
                 tokens.addRef(tokens2.current())
     
         tokens.reset()
@@ -538,13 +545,19 @@ class ExcelParser(ExcelParserTokens):
         output = ""
         if self.tokens:
             for t in self.tokens.items:
-                if   t.ttype == self.TOK_TYPE_FUNCTION and t.tsubtype == self.TOK_SUBTYPE_START:     output += t.tvalue + "("
-                elif t.ttype == self.TOK_TYPE_FUNCTION and t.tsubtype == self.TOK_SUBTYPE_STOP:      output += ")"
-                elif t.ttype == self.TOK_TYPE_SUBEXPR  and t.tsubtype == self.TOK_SUBTYPE_START:     output += "("
-                elif t.ttype == self.TOK_TYPE_SUBEXPR  and t.tsubtype == self.TOK_SUBTYPE_STOP:      output += ")"
+                if   t.ttype == self.TOK_TYPE_FUNCTION and t.tsubtype == self.TOK_SUBTYPE_START:
+                    output += t.tvalue + "("
+                elif t.ttype == self.TOK_TYPE_FUNCTION and t.tsubtype == self.TOK_SUBTYPE_STOP:
+                    output += ")"
+                elif t.ttype == self.TOK_TYPE_SUBEXPR  and t.tsubtype == self.TOK_SUBTYPE_START:
+                    output += "("
+                elif t.ttype == self.TOK_TYPE_SUBEXPR  and t.tsubtype == self.TOK_SUBTYPE_STOP:
+                    output += ")"
                 # TODO: add in RE substitution of " with "" for strings
-                elif t.ttype == self.TOK_TYPE_OPERAND  and t.tsubtype == self.TOK_SUBTYPE_TEXT:      output += "\"" + t.tvalue + "\""
-                elif t.ttype == self.TOK_TYPE_OP_IN    and t.tsubtype == self.TOK_SUBTYPE_INTERSECT: output += " "                    
+                elif t.ttype == self.TOK_TYPE_OPERAND  and t.tsubtype == self.TOK_SUBTYPE_TEXT:
+                    output += "\"" + t.tvalue + "\""
+                elif t.ttype == self.TOK_TYPE_OP_IN    and t.tsubtype == self.TOK_SUBTYPE_INTERSECT:
+                    output += " "
 
                 else: output += t.tvalue
         return output
@@ -554,14 +567,13 @@ class ExcelParser(ExcelParserTokens):
         output = ""
         if self.tokens:
             for t in self.tokens.items:
-                #print "'",t.ttype,t.tsubtype,t.tvalue,"'"
-                if (t.tsubtype == self.TOK_SUBTYPE_STOP):
+                if t.tsubtype == self.TOK_SUBTYPE_STOP:
                     indent -= 1
     
                 output += "    "*indent + t.tvalue + " <" + t.ttype +"> <" + t.tsubtype + ">" + "\n"
  
-                if (t.tsubtype == self.TOK_SUBTYPE_START):
-                    indent += 1;
+                if t.tsubtype == self.TOK_SUBTYPE_START:
+                    indent += 1
         return output
 
 class Operator:
@@ -615,7 +627,7 @@ def shunting_yard(expression):
     if expression.startswith('='):
         expression = expression[1:]
         
-    p = ExcelParser();
+    p = ExcelParser()
     p.parse(expression)
 
     # insert tokens for '(' and ')', to make things cleaner below
@@ -624,11 +636,11 @@ def shunting_yard(expression):
         if t.ttype == "function" and t.tsubtype == "start":
             t.tsubtype = ""
             tokens.append(t)
-            tokens.append(f_token('(','arglist','start'))
+            tokens.append(f_token('(', 'arglist', 'start'))
         elif t.ttype == "function" and t.tsubtype == "stop":
-            #t.tsubtype = ""
-            #tokens.append(t)
-            tokens.append(f_token(')','arglist','stop'))
+            # t.tsubtype = ""
+            # tokens.append(t)
+            tokens.append(f_token(')', 'arglist', 'stop'))
         elif t.ttype == "subexpression" and t.tsubtype == "start":
             t.tvalue = '('
             tokens.append(t)
@@ -638,27 +650,27 @@ def shunting_yard(expression):
         else:
             tokens.append(t)
 
-    print "tokens: ", "|".join([x.tvalue for x in tokens])
+    print("tokens: ", "|".join([x.tvalue for x in tokens]))
 
     #http://office.microsoft.com/en-us/excel-help/calculation-operators-and-precedence-HP010078886.aspx
     operators = {}
-    operators[':'] = Operator(':',8,'left')
-    operators[''] = Operator(' ',8,'left')
-    operators[','] = Operator(',',8,'left')
-    operators['u-'] = Operator('u-',7,'left') #unary negation
-    operators['%'] = Operator('%',6,'left')
-    operators['^'] = Operator('^',5,'left')
-    operators['*'] = Operator('*',4,'left')
-    operators['/'] = Operator('/',4,'left')
-    operators['+'] = Operator('+',3,'left')
-    operators['-'] = Operator('-',3,'left')
-    operators['&'] = Operator('&',2,'left')
-    operators['='] = Operator('=',1,'left')
-    operators['<'] = Operator('<',1,'left')
-    operators['>'] = Operator('>',1,'left')
-    operators['<='] = Operator('<=',1,'left')
-    operators['>='] = Operator('>=',1,'left')
-    operators['<>'] = Operator('<>',1,'left')
+    operators[':'] = Operator(':', 8, 'left')
+    operators[''] = Operator(' ', 8, 'left')
+    operators[','] = Operator(',', 8, 'left')
+    operators['u-'] = Operator('u-', 7, 'left')  # unary negation
+    operators['%'] = Operator('%', 6, 'left')
+    operators['^'] = Operator('^', 5, 'left')
+    operators['*'] = Operator('*', 4, 'left')
+    operators['/'] = Operator('/', 4, 'left')
+    operators['+'] = Operator('+', 3, 'left')
+    operators['-'] = Operator('-', 3, 'left')
+    operators['&'] = Operator('&', 2, 'left')
+    operators['='] = Operator('=', 1, 'left')
+    operators['<'] = Operator('<', 1, 'left')
+    operators['>'] = Operator('>', 1, 'left')
+    operators['<='] = Operator('<=', 1, 'left')
+    operators['>='] = Operator('>=', 1, 'left')
+    operators['<>'] = Operator('<>', 1, 'left')
             
     output = collections.deque()
     stack = []
@@ -666,9 +678,9 @@ def shunting_yard(expression):
     arg_count = []
     
     def po():
-        print "output: ", "|".join([x.tvalue for x in output])
+        print("output: ", "|".join([x.tvalue for x in output]))
     def so():
-        print "stack:", "|".join([x.tvalue for x in stack])
+        print("stack:", "|".join([x.tvalue for x in stack]))
     
     for t in tokens:
         if t.ttype == "operand":
@@ -692,29 +704,29 @@ def shunting_yard(expression):
             while stack and (stack[-1].tsubtype != "start"):
                 output.append(create_node(stack.pop()))   
             
-            if were_values.pop(): arg_count[-1] += 1
+            if were_values.pop():
+                arg_count[-1] += 1
             were_values.append(False)
             
             if not len(stack):
                 raise Exception("Mismatched or misplaced parentheses")
         
         elif t.ttype.startswith('operator'):
-            if t.ttype.endswith('-prefix') and t.tvalue =="-":
+            if t.ttype.endswith('-prefix') and t.tvalue == "-":
                 o1 = operators['u-']
             else:
                 o1 = operators[t.tvalue]
 
-                
             while stack and stack[-1].ttype.startswith('operator'):
                 
-                if stack[-1].ttype.endswith('-prefix') and stack[-1].tvalue =="-":
+                if stack[-1].ttype.endswith('-prefix') and stack[-1].tvalue == "-":
                     o2 = operators['u-']
                 else:
                     o2 = operators[stack[-1].tvalue]
                 
-                if ( (o1.associativity == "left" and o1.precedence <= o2.precedence)
-                        or
-                      (o1.associativity == "right" and o1.precedence < o2.precedence) ):
+                if ((o1.associativity == "left" and o1.precedence <= o2.precedence)
+                    or
+                    (o1.associativity == "right" and o1.precedence < o2.precedence)):
                     
                     output.append(create_node(stack.pop()))
                 else:
@@ -741,7 +753,7 @@ def shunting_yard(expression):
                 w = were_values.pop()
                 if w: a += 1
                 f.num_args = a
-                print f, "has ",a," args"
+                print(f, "has ", a, " args")
                 output.append(f)
 
     while stack:
